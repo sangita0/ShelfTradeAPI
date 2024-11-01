@@ -1,0 +1,6 @@
+@ServicesForShelfSwap_HostAddress = http://localhost:5186
+
+GET {{ServicesForShelfSwap_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
