@@ -1,0 +1,138 @@
+USE [ShelfTrade]
+GO
+/****** Object:  Table [dbo].[Books]    Script Date: 11/1/2024 11:04:07 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Books](
+	[BookId] [int] IDENTITY(1,1) NOT NULL,
+	[Title] [nvarchar](255) NOT NULL,
+	[Author] [nvarchar](255) NOT NULL,
+	[Genre] [nvarchar](100) NOT NULL,
+	[Condition] [nvarchar](50) NOT NULL,
+	[AvailabilityStatus] [nvarchar](50) NOT NULL,
+	[UserId] [int] NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+	[Location] [varchar](max) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[BookId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ExchangeRequests]    Script Date: 11/1/2024 11:04:07 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ExchangeRequests](
+	[RequestId] [int] IDENTITY(1,1) NOT NULL,
+	[FromUserId] [int] NOT NULL,
+	[ToUserId] [int] NOT NULL,
+	[BookId] [int] NOT NULL,
+	[RequestStatus] [nvarchar](50) NOT NULL,
+	[DeliveryMethod] [nvarchar](100) NULL,
+	[ExchangeDuration] [nvarchar](50) NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RequestId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PasswordResets]    Script Date: 11/1/2024 11:04:07 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PasswordResets](
+	[ResetId] [int] IDENTITY(1,1) NOT NULL,
+	[UserId] [int] NOT NULL,
+	[ResetToken] [nvarchar](255) NOT NULL,
+	[ExpiryDate] [datetime] NOT NULL,
+	[IsUsed] [bit] NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ResetId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 11/1/2024 11:04:07 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserId] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NOT NULL,
+	[Email] [nvarchar](255) NOT NULL,
+	[PasswordHash] [nvarchar](255) NOT NULL,
+	[FavouriteGenre] [nvarchar](100) NULL,
+	[ReadingPreferences] [nvarchar](255) NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+	[ResetToken] [nvarchar](50) NULL,
+	[ResetTokenExpiry] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[Books] ON 
+GO
+INSERT [dbo].[Books] ([BookId], [Title], [Author], [Genre], [Condition], [AvailabilityStatus], [UserId], [CreatedAt], [UpdatedAt], [Location]) VALUES (3, N'half', N'string', N'string', N'string', N'string', 0, CAST(N'2024-10-29T17:09:08.187' AS DateTime), CAST(N'2024-10-29T17:09:53.067' AS DateTime), N'string')
+GO
+SET IDENTITY_INSERT [dbo].[Books] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Users] ON 
+GO
+INSERT [dbo].[Users] ([UserId], [Name], [Email], [PasswordHash], [FavouriteGenre], [ReadingPreferences], [CreatedAt], [UpdatedAt], [ResetToken], [ResetTokenExpiry]) VALUES (2, N'Sangita Parui', N'sangitaparui9@gmail.com', N'$2a$11$K1rU/q1p4xwgKpWmZScwReRVAzxzFb5M50EPHCvB4xc/jLhMGls8a', N'Mythology', N'Story', CAST(N'2024-10-25T23:12:35.037' AS DateTime), CAST(N'2024-10-25T23:12:35.037' AS DateTime), NULL, NULL)
+GO
+INSERT [dbo].[Users] ([UserId], [Name], [Email], [PasswordHash], [FavouriteGenre], [ReadingPreferences], [CreatedAt], [UpdatedAt], [ResetToken], [ResetTokenExpiry]) VALUES (3, N'Sangita', N'sangita.pragathisolutions@gmail.com', N'$2a$11$ph5vLH46.zBRi9S3loC7AO6uZHCjHkz1scCiXMDQKPIS/f3yguXQO', N'History', N'Story', CAST(N'2024-10-26T17:29:08.853' AS DateTime), CAST(N'2024-10-26T17:29:08.857' AS DateTime), NULL, NULL)
+GO
+SET IDENTITY_INSERT [dbo].[Users] OFF
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Users__A9D1053443A358A5]    Script Date: 11/1/2024 11:04:07 AM ******/
+ALTER TABLE [dbo].[Users] ADD UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Books] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Books] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[ExchangeRequests] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[ExchangeRequests] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[PasswordResets] ADD  DEFAULT ((0)) FOR [IsUsed]
+GO
+ALTER TABLE [dbo].[PasswordResets] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Books]  WITH NOCHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+ALTER TABLE [dbo].[ExchangeRequests]  WITH CHECK ADD FOREIGN KEY([BookId])
+REFERENCES [dbo].[Books] ([BookId])
+GO
+ALTER TABLE [dbo].[ExchangeRequests]  WITH CHECK ADD FOREIGN KEY([FromUserId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+ALTER TABLE [dbo].[ExchangeRequests]  WITH CHECK ADD FOREIGN KEY([ToUserId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+ALTER TABLE [dbo].[PasswordResets]  WITH CHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
