@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/auth")]
 [ApiController]
@@ -119,6 +120,7 @@ public class AuthController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ServicesForShelfSwap.Models.ResetPasswordRequest request)
     {
@@ -129,15 +131,19 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "User with the provided email does not exist." });
         }
 
-        // Generate a password reset token (This can be a unique token stored in a separate table or a JWT)
-        string resetToken = Guid.NewGuid().ToString(); // Simple example, consider using a more secure approach
+        // Generate a password reset token and set expiry
+        string resetToken = Guid.NewGuid().ToString(); // Generate a new token
+        user.ResetToken = resetToken; // Store the reset token in the user record
+        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1); // Set expiry time, e.g., 1 hour
+        await _context.SaveChangesAsync(); // Save changes to the database
 
-        // Store the reset token and send it via email
+        // Create reset link
         string resetLink = $"{_configuration["AppSettings:ClientUrl"]}/reset-password?token={resetToken}";
         await SendPasswordResetEmail(request.Email, resetLink);
 
         return Ok(new { message = "Password reset link sent to the registered email." });
     }
+
 
     private async Task SendPasswordResetEmail(string email, string resetLink)
     {
@@ -166,27 +172,36 @@ public class AuthController : ControllerBase
             // Log exception or handle error
         }
     }
+    
     [HttpPut("update-password")]
     public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
     {
-        // Retrieve the user associated with the reset token from the database
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.ResetToken == request.Token && u.ResetTokenExpiry > DateTime.UtcNow);
+        // Check if the reset token exists
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ResetToken == request.Token);
+
         if (user == null)
         {
-            return BadRequest(new { message = "Invalid or expired reset token." });
+            return BadRequest(new { message = "Invalid reset token." });
         }
 
-        // Update the password after hashing it
+        // Check if the reset token has expired
+        if (user.ResetTokenExpiry <= DateTime.UtcNow)
+        {
+            return BadRequest(new { message = "Reset token has expired." });
+        }
+
+        // Update the password
         user.PasswordHash = HashPassword(request.NewPassword);
-        user.ResetToken = null; // Clear the reset token after successful password reset
+        user.ResetToken = null; // Clear the reset token
         user.ResetTokenExpiry = null;
 
-        // Update the user's password in the database
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Password updated successfully." });
     }
+
+
 
     private string HashPassword(string password)
     {
